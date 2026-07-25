@@ -14,6 +14,11 @@ export interface Control {
 
 export type ControlValues = Record<string, string | boolean | number>;
 
+export interface ComponentState {
+  name: string;
+  render: () => ReactNode;
+}
+
 export interface ComponentDemo {
   slug: string;
   name: string;
@@ -22,4 +27,5 @@ export interface ComponentDemo {
   controls: Control[];
   render: (values: ControlValues) => ReactNode;
   code: (values: ControlValues) => string;
+  states?: ComponentState[];
 }

@@ -109,6 +109,25 @@ export function Playground({ demo }: { demo: ComponentDemo }) {
         </div>
       </div>
 
+      {demo.states && demo.states.length > 0 && (
+        <div className="border-border rounded-lg border p-4">
+          <span className="text-sm font-medium">États</span>
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {demo.states.map((state) => (
+              <div
+                key={state.name}
+                className="border-border bg-card flex flex-col items-center gap-3 rounded-lg border p-4"
+              >
+                <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                  {state.name}
+                </span>
+                <div className="flex w-full items-center justify-center">{state.render()}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="border-border rounded-lg border">
         <div className="border-border flex items-center justify-between border-b px-4 py-2">
           <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">

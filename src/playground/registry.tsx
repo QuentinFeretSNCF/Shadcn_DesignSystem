@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, type ComponentProps } from "react";
 import type { ComponentDemo, ControlValues } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -201,6 +201,7 @@ const TYPE_PLACEHOLDERS: Record<string, string> = {
 function InputFieldDemo({
   label,
   helpText,
+  showHelpText,
   requirement,
   type,
   maxLength,
@@ -209,6 +210,7 @@ function InputFieldDemo({
 }: {
   label: string;
   helpText: string;
+  showHelpText: boolean;
   requirement: "required" | "optional" | "none";
   type: "text" | "email" | "tel";
   maxLength: number;
@@ -230,7 +232,7 @@ function InputFieldDemo({
             <span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>
           )}
         </FieldLabel>
-        {helpText && <FieldDescription>{helpText}</FieldDescription>}
+        {showHelpText && helpText && <FieldDescription>{helpText}</FieldDescription>}
         <Input
           id={id}
           type={type}
@@ -257,6 +259,50 @@ function InputFieldDemo({
     </FieldGroup>
   );
 }
+
+// Styles forcés pour représenter statiquement des pseudo-états (hover, focus,
+// pressed...) impossibles à déclencher sans interaction utilisateur réelle.
+const FORCED_RING = "border-ring ring-[3px] ring-ring/50";
+
+function InputStatePreview({ className, ...props }: ComponentProps<typeof Input>) {
+  const id = useId();
+  return <Input id={id} className={cn("w-40", className)} {...props} />;
+}
+
+const INPUT_STATES: ComponentDemo["states"] = [
+  { name: "Enabled", render: () => <InputStatePreview placeholder="Texte" /> },
+  { name: "Disabled", render: () => <InputStatePreview placeholder="Texte" disabled /> },
+  {
+    name: "Hovered",
+    render: () => <InputStatePreview placeholder="Texte" className="border-ring/60" />,
+  },
+  {
+    name: "Focused",
+    render: () => <InputStatePreview placeholder="Texte" className={FORCED_RING} />,
+  },
+  {
+    name: "Pressed",
+    render: () => (
+      <InputStatePreview placeholder="Texte" className="border-ring ring-[2px] ring-ring/70" />
+    ),
+  },
+  {
+    name: "Active",
+    render: () => <InputStatePreview defaultValue="Saisie en cours" className={FORCED_RING} />,
+  },
+  {
+    name: "Read only",
+    render: () => <InputStatePreview defaultValue="Valeur figée" readOnly />,
+  },
+  {
+    name: "Error",
+    render: () => <InputStatePreview defaultValue="valeur incorrecte" aria-invalid="true" />,
+  },
+  {
+    name: "Valid",
+    render: () => <InputStatePreview defaultValue="valeur correcte" data-valid="true" />,
+  },
+];
 
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
@@ -297,6 +343,7 @@ export const demos: ComponentDemo[] = [
     description: "Champ de saisie texte, avec label, texte d'aide, indicateur requis/optionnel, compteur de caractères et indice de format.",
     controls: [
       { key: "label", label: "label", type: "text", default: "Adresse email" },
+      { key: "showHelpText", label: "afficher le texte d'aide", type: "boolean", default: true },
       { key: "helpText", label: "texte d'aide", type: "text", default: "Utilisée uniquement pour la connexion et les notifications." },
       { key: "requirement", label: "requirement", type: "select", options: ["required", "optional", "none"], default: "required" },
       { key: "type", label: "type", type: "select", options: ["text", "email", "tel"], default: "email" },
@@ -308,6 +355,7 @@ export const demos: ComponentDemo[] = [
       <InputFieldDemo
         label={bt(v, "label")}
         helpText={bt(v, "helpText")}
+        showHelpText={bb(v, "showHelpText")}
         requirement={bv(v, "requirement") as "required" | "optional" | "none"}
         type={bv(v, "type") as "text" | "email" | "tel"}
         maxLength={Number(v.maxLength)}
@@ -320,8 +368,10 @@ export const demos: ComponentDemo[] = [
       const type = bv(v, "type");
       const maxLength = Number(v.maxLength);
       const requiredMark = requirement === "required" ? `<span className="text-destructive ml-0.5">*</span>` : requirement === "optional" ? `<span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>` : "";
-      return `<Field>\n  <FieldLabel htmlFor="email">\n    ${bt(v, "label")}${requiredMark ? `\n    ${requiredMark}` : ""}\n  </FieldLabel>\n  <FieldDescription>${bt(v, "helpText")}</FieldDescription>\n  <Input\n    id="email"\n    type="${type}"\n    maxLength={${maxLength}}\n    value={value}\n    onChange={(e) => setValue(e.target.value)}\n  />\n  <div className="flex items-start justify-between gap-4">\n    <FieldDescription>${FORMAT_HINTS[type] ?? ""}</FieldDescription>\n    ${bb(v, "showCounter") ? `<span className="text-muted-foreground text-xs tabular-nums">{value.length} / ${maxLength}</span>` : ""}\n  </div>\n</Field>`;
+      const helpLine = bb(v, "showHelpText") ? `\n  <FieldDescription>${bt(v, "helpText")}</FieldDescription>` : "";
+      return `<Field>\n  <FieldLabel htmlFor="email">\n    ${bt(v, "label")}${requiredMark ? `\n    ${requiredMark}` : ""}\n  </FieldLabel>${helpLine}\n  <Input\n    id="email"\n    type="${type}"\n    maxLength={${maxLength}}\n    value={value}\n    onChange={(e) => setValue(e.target.value)}\n  />\n  <div className="flex items-start justify-between gap-4">\n    <FieldDescription>${FORMAT_HINTS[type] ?? ""}</FieldDescription>\n    ${bb(v, "showCounter") ? `<span className="text-muted-foreground text-xs tabular-nums">{value.length} / ${maxLength}</span>` : ""}\n  </div>\n</Field>`;
     },
+    states: INPUT_STATES,
   },
   {
     slug: "textarea",
