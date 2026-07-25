@@ -45,7 +45,9 @@ export default function App() {
           </div>
           <nav className="min-h-0 flex-1 overflow-y-auto p-2">
             {categories.map((category) => {
-              const items = filtered.filter((d) => d.category === category);
+              const items = filtered
+                .filter((d) => d.category === category)
+                .sort((a, b) => a.name.localeCompare(b.name));
               if (items.length === 0) return null;
               return (
                 <div key={category} className="mb-3">
