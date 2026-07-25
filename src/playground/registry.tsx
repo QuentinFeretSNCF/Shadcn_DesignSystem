@@ -110,6 +110,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
+import { SegmentedControl, type SegmentedControlOption } from "@/components/ui/segmented-control";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
   Pagination,
@@ -182,6 +183,8 @@ import {
   Search,
   Terminal,
   AlertCircle,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 import { Bar, BarChart, XAxis } from "recharts";
 
@@ -388,6 +391,55 @@ const MULTISELECT_STATES: ComponentDemo["states"] = [
   },
 ];
 
+const SEGMENTED_VIEW_OPTIONS: SegmentedControlOption[] = [
+  { value: "grid", label: "Grille", icon: LayoutGrid },
+  { value: "list", label: "Liste", icon: List },
+];
+
+function SegmentedControlDemo({
+  disabled,
+  initial,
+}: {
+  disabled: boolean;
+  initial: string;
+}) {
+  const [value, setValue] = useState(initial);
+  return (
+    <SegmentedControl
+      options={SEGMENTED_VIEW_OPTIONS}
+      value={value}
+      onValueChange={setValue}
+      disabled={disabled}
+    />
+  );
+}
+
+const SEGMENTED_CONTROL_STATES: ComponentDemo["states"] = [
+  {
+    name: "Grille active",
+    render: () => (
+      <SegmentedControl options={SEGMENTED_VIEW_OPTIONS} value="grid" onValueChange={() => {}} />
+    ),
+  },
+  {
+    name: "Liste active",
+    render: () => (
+      <SegmentedControl options={SEGMENTED_VIEW_OPTIONS} value="list" onValueChange={() => {}} />
+    ),
+  },
+  {
+    name: "Disabled",
+    render: () => (
+      <SegmentedControl
+        options={SEGMENTED_VIEW_OPTIONS}
+        value="grid"
+        onValueChange={() => {}}
+        disabled
+      />
+    ),
+  },
+];
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -556,6 +608,16 @@ export const demos: ComponentDemo[] = [
       </Select>
     ),
     code: (v) => `<Select${bb(v, "disabled") ? " disabled" : ""} defaultValue="kanban">\n  <SelectTrigger className="w-48">\n    <SelectValue placeholder="Choisir une vue" />\n  </SelectTrigger>\n  <SelectContent>\n    <SelectItem value="kanban">Kanban</SelectItem>\n    <SelectItem value="sprints">Sprints</SelectItem>\n  </SelectContent>\n</Select>`,
+  },
+  {
+    slug: "segmented-control",
+    name: "Segmented Control",
+    category: "Inputs & Forms",
+    description: "Toggle à options exclusives, présentées comme deux (ou plus) boutons collés dans une même pilule — l'option active se distingue par un fond. Composant maison (non fourni par shadcn/ui).",
+    controls: [{ key: "disabled", label: "disabled", type: "boolean", default: false }],
+    render: (v) => <SegmentedControlDemo disabled={bb(v, "disabled")} initial="grid" />,
+    code: (v) => `const [value, setValue] = useState("grid");\n\n<SegmentedControl\n  options={[\n    { value: "grid", label: "Grille", icon: LayoutGrid },\n    { value: "list", label: "Liste", icon: List },\n  ]}\n  value={value}\n  onValueChange={setValue}${bb(v, "disabled") ? "\n  disabled" : ""}\n/>`,
+    states: SEGMENTED_CONTROL_STATES,
   },
   {
     slug: "native-select",
