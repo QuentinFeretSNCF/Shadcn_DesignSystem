@@ -1,4 +1,6 @@
+import { useId, useState } from "react";
 import type { ComponentDemo, ControlValues } from "./types";
+import { cn } from "@/lib/utils";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -186,6 +188,76 @@ const bv = (v: ControlValues, key: string) => String(v[key]);
 const bb = (v: ControlValues, key: string) => Boolean(v[key]);
 const bt = (v: ControlValues, key: string) => String(v[key]);
 
+const FORMAT_HINTS: Record<string, string> = {
+  email: "Format attendu : nom@domaine.fr",
+  tel: "Format attendu : 06 12 34 56 78",
+};
+const TYPE_PLACEHOLDERS: Record<string, string> = {
+  email: "nom@domaine.fr",
+  tel: "06 12 34 56 78",
+  text: "Saisissez du texte",
+};
+
+function InputFieldDemo({
+  label,
+  helpText,
+  requirement,
+  type,
+  maxLength,
+  showCounter,
+  disabled,
+}: {
+  label: string;
+  helpText: string;
+  requirement: "required" | "optional" | "none";
+  type: "text" | "email" | "tel";
+  maxLength: number;
+  showCounter: boolean;
+  disabled: boolean;
+}) {
+  const [value, setValue] = useState("");
+  const id = useId();
+  const hasLimit = maxLength > 0;
+  const nearLimit = hasLimit && value.length >= maxLength;
+
+  return (
+    <FieldGroup className="w-72">
+      <Field>
+        <FieldLabel htmlFor={id}>
+          {label}
+          {requirement === "required" && <span className="text-destructive ml-0.5">*</span>}
+          {requirement === "optional" && (
+            <span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>
+          )}
+        </FieldLabel>
+        {helpText && <FieldDescription>{helpText}</FieldDescription>}
+        <Input
+          id={id}
+          type={type}
+          placeholder={TYPE_PLACEHOLDERS[type]}
+          disabled={disabled}
+          value={value}
+          maxLength={hasLimit ? maxLength : undefined}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <div className="flex items-start justify-between gap-4">
+          {FORMAT_HINTS[type] ? <FieldDescription>{FORMAT_HINTS[type]}</FieldDescription> : <span />}
+          {showCounter && hasLimit && (
+            <span
+              className={cn(
+                "text-muted-foreground shrink-0 text-xs tabular-nums",
+                nearLimit && "text-destructive"
+              )}
+            >
+              {value.length} / {maxLength}
+            </span>
+          )}
+        </div>
+      </Field>
+    </FieldGroup>
+  );
+}
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -222,14 +294,34 @@ export const demos: ComponentDemo[] = [
     slug: "input",
     name: "Input",
     category: "Inputs & Forms",
-    description: "Champ de saisie texte natif stylé.",
+    description: "Champ de saisie texte, avec label, texte d'aide, indicateur requis/optionnel, compteur de caractères et indice de format.",
     controls: [
-      { key: "placeholder", label: "placeholder", type: "text", default: "Adresse email" },
+      { key: "label", label: "label", type: "text", default: "Adresse email" },
+      { key: "helpText", label: "texte d'aide", type: "text", default: "Utilisée uniquement pour la connexion et les notifications." },
+      { key: "requirement", label: "requirement", type: "select", options: ["required", "optional", "none"], default: "required" },
+      { key: "type", label: "type", type: "select", options: ["text", "email", "tel"], default: "email" },
+      { key: "maxLength", label: "limite de caractères", type: "number", default: 40, min: 0, max: 200 },
+      { key: "showCounter", label: "afficher le compteur", type: "boolean", default: true },
       { key: "disabled", label: "disabled", type: "boolean", default: false },
-      { key: "type", label: "type", type: "select", options: ["text", "email", "password", "number"], default: "email" },
     ],
-    render: (v) => <Input type={bv(v, "type")} placeholder={bt(v, "placeholder")} disabled={bb(v, "disabled")} className="w-64" />,
-    code: (v) => `<Input type="${bv(v, "type")}" placeholder="${bt(v, "placeholder")}"${bb(v, "disabled") ? " disabled" : ""} />`,
+    render: (v) => (
+      <InputFieldDemo
+        label={bt(v, "label")}
+        helpText={bt(v, "helpText")}
+        requirement={bv(v, "requirement") as "required" | "optional" | "none"}
+        type={bv(v, "type") as "text" | "email" | "tel"}
+        maxLength={Number(v.maxLength)}
+        showCounter={bb(v, "showCounter")}
+        disabled={bb(v, "disabled")}
+      />
+    ),
+    code: (v) => {
+      const requirement = bv(v, "requirement");
+      const type = bv(v, "type");
+      const maxLength = Number(v.maxLength);
+      const requiredMark = requirement === "required" ? `<span className="text-destructive ml-0.5">*</span>` : requirement === "optional" ? `<span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>` : "";
+      return `<Field>\n  <FieldLabel htmlFor="email">\n    ${bt(v, "label")}${requiredMark ? `\n    ${requiredMark}` : ""}\n  </FieldLabel>\n  <FieldDescription>${bt(v, "helpText")}</FieldDescription>\n  <Input\n    id="email"\n    type="${type}"\n    maxLength={${maxLength}}\n    value={value}\n    onChange={(e) => setValue(e.target.value)}\n  />\n  <div className="flex items-start justify-between gap-4">\n    <FieldDescription>${FORMAT_HINTS[type] ?? ""}</FieldDescription>\n    ${bb(v, "showCounter") ? `<span className="text-muted-foreground text-xs tabular-nums">{value.length} / ${maxLength}</span>` : ""}\n  </div>\n</Field>`;
+    },
   },
   {
     slug: "textarea",
