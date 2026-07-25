@@ -109,6 +109,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
   Pagination,
@@ -304,6 +305,89 @@ const INPUT_STATES: ComponentDemo["states"] = [
   },
 ];
 
+const MULTISELECT_OPTIONS: MultiSelectOption[] = [
+  { value: "kanban", label: "Kanban" },
+  { value: "sprints", label: "Sprints" },
+  { value: "calendrier", label: "Calendrier" },
+  { value: "projets", label: "Projets" },
+  { value: "equipe", label: "Équipe" },
+];
+
+function MultiSelectDemo({
+  maxCount,
+  disabled,
+  placeholder,
+  initial,
+}: {
+  maxCount: number;
+  disabled: boolean;
+  placeholder: string;
+  initial: string[];
+}) {
+  const [value, setValue] = useState<string[]>(initial);
+  return (
+    <div className="w-72">
+      <MultiSelect
+        options={MULTISELECT_OPTIONS}
+        value={value}
+        onValueChange={setValue}
+        maxCount={maxCount}
+        disabled={disabled}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
+const MULTISELECT_STATES: ComponentDemo["states"] = [
+  {
+    name: "Vide",
+    render: () => (
+      <div className="w-52">
+        <MultiSelect options={MULTISELECT_OPTIONS} value={[]} onValueChange={() => {}} />
+      </div>
+    ),
+  },
+  {
+    name: "Avec sélection",
+    render: () => (
+      <div className="w-52">
+        <MultiSelect
+          options={MULTISELECT_OPTIONS}
+          value={["kanban", "sprints"]}
+          onValueChange={() => {}}
+        />
+      </div>
+    ),
+  },
+  {
+    name: "Débordement (+N)",
+    render: () => (
+      <div className="w-52">
+        <MultiSelect
+          options={MULTISELECT_OPTIONS}
+          value={["kanban", "sprints", "calendrier", "projets", "equipe"]}
+          maxCount={2}
+          onValueChange={() => {}}
+        />
+      </div>
+    ),
+  },
+  {
+    name: "Disabled",
+    render: () => (
+      <div className="w-52">
+        <MultiSelect
+          options={MULTISELECT_OPTIONS}
+          value={["kanban"]}
+          onValueChange={() => {}}
+          disabled
+        />
+      </div>
+    ),
+  },
+];
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -486,6 +570,27 @@ export const demos: ComponentDemo[] = [
       </NativeSelect>
     ),
     code: (v) => `<NativeSelect${bb(v, "disabled") ? " disabled" : ""} defaultValue="fr">\n  <NativeSelectOption value="fr">Français</NativeSelectOption>\n  <NativeSelectOption value="en">English</NativeSelectOption>\n</NativeSelect>`,
+  },
+  {
+    slug: "multi-select",
+    name: "Multi Select",
+    category: "Inputs & Forms",
+    description: "Sélection multiple avec recherche, badges retirables et repli au-delà d'une limite. Composant maison (non fourni par shadcn/ui), construit sur Popover + Command + Badge.",
+    controls: [
+      { key: "placeholder", label: "placeholder", type: "text", default: "Sélectionner des vues..." },
+      { key: "maxCount", label: "maxCount (badges avant +N)", type: "number", default: 3, min: 1, max: 5 },
+      { key: "disabled", label: "disabled", type: "boolean", default: false },
+    ],
+    render: (v) => (
+      <MultiSelectDemo
+        placeholder={bt(v, "placeholder")}
+        maxCount={Number(v.maxCount)}
+        disabled={bb(v, "disabled")}
+        initial={["kanban", "sprints"]}
+      />
+    ),
+    code: (v) => `const [value, setValue] = useState<string[]>(["kanban", "sprints"]);\n\n<MultiSelect\n  options={options}\n  value={value}\n  onValueChange={setValue}\n  placeholder="${bt(v, "placeholder")}"\n  maxCount={${v.maxCount}}${bb(v, "disabled") ? "\n  disabled" : ""}\n/>`,
+    states: MULTISELECT_STATES,
   },
   {
     slug: "slider",
