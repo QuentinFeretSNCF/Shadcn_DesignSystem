@@ -512,6 +512,57 @@ function FormDemo({ title, fieldCount }: { title: string; fieldCount: number }) 
   );
 }
 
+function CheckboxFieldDemo({
+  label,
+  requirement,
+  showLink,
+  linkText,
+  showDescription,
+  description,
+  checked,
+  disabled,
+}: {
+  label: string;
+  requirement: "required" | "optional" | "none";
+  showLink: boolean;
+  linkText: string;
+  showDescription: boolean;
+  description: string;
+  checked: boolean;
+  disabled: boolean;
+}) {
+  const id = useId();
+  return (
+    <div className="flex w-80 items-start gap-2">
+      <Checkbox id={id} defaultChecked={checked} disabled={disabled} className="mt-0.5" />
+      <div className="grid gap-1 leading-none">
+        <Label htmlFor={id}>
+          {label}
+          {requirement === "required" && <span className="text-destructive ml-0.5">*</span>}
+          {requirement === "optional" && (
+            <span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>
+          )}
+          {showLink && (
+            <>
+              {" "}
+              <a
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                className="text-primary underline underline-offset-4"
+              >
+                {linkText}
+              </a>
+            </>
+          )}
+        </Label>
+        {showDescription && description && (
+          <p className="text-muted-foreground text-sm font-normal">{description}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -623,19 +674,36 @@ export const demos: ComponentDemo[] = [
     slug: "checkbox",
     name: "Checkbox",
     category: "Inputs & Forms",
-    description: "Case à cocher pour un choix binaire.",
+    description: "Case à cocher, avec mention obligatoire/optionnelle, lien dans le label et description sous le label.",
     controls: [
+      { key: "text", label: "label", type: "text", default: "J'accepte les" },
+      { key: "requirement", label: "requirement", type: "select", options: ["required", "optional", "none"], default: "none" },
+      { key: "showLink", label: "lien dans le label", type: "boolean", default: true },
+      { key: "linkText", label: "texte du lien", type: "text", default: "conditions d'utilisation" },
+      { key: "showDescription", label: "afficher la description", type: "boolean", default: true },
+      { key: "description", label: "description", type: "text", default: "Tu recevras un email de confirmation." },
       { key: "checked", label: "checked (défaut)", type: "boolean", default: true },
       { key: "disabled", label: "disabled", type: "boolean", default: false },
-      { key: "text", label: "label", type: "text", default: "Accepter les conditions" },
     ],
     render: (v) => (
-      <div className="flex items-center gap-2">
-        <Checkbox id="demo-checkbox" defaultChecked={bb(v, "checked")} disabled={bb(v, "disabled")} />
-        <Label htmlFor="demo-checkbox">{bt(v, "text")}</Label>
-      </div>
+      <CheckboxFieldDemo
+        label={bt(v, "text")}
+        requirement={bv(v, "requirement") as "required" | "optional" | "none"}
+        showLink={bb(v, "showLink")}
+        linkText={bt(v, "linkText")}
+        showDescription={bb(v, "showDescription")}
+        description={bt(v, "description")}
+        checked={bb(v, "checked")}
+        disabled={bb(v, "disabled")}
+      />
     ),
-    code: (v) => `<Checkbox id="terms"${bb(v, "checked") ? " defaultChecked" : ""}${bb(v, "disabled") ? " disabled" : ""} />\n<Label htmlFor="terms">${bt(v, "text")}</Label>`,
+    code: (v) => {
+      const requirement = bv(v, "requirement");
+      const requiredMark = requirement === "required" ? `<span className="text-destructive ml-0.5">*</span>` : requirement === "optional" ? `<span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>` : "";
+      const link = bb(v, "showLink") ? ` <a href="#" className="text-primary underline underline-offset-4">${bt(v, "linkText")}</a>` : "";
+      const description = bb(v, "showDescription") ? `\n    <p className="text-muted-foreground text-sm font-normal">${bt(v, "description")}</p>` : "";
+      return `<div className="flex items-start gap-2">\n  <Checkbox id="terms"${bb(v, "checked") ? " defaultChecked" : ""}${bb(v, "disabled") ? " disabled" : ""} />\n  <div className="grid gap-1 leading-none">\n    <Label htmlFor="terms">\n      ${bt(v, "text")}${requiredMark ? ` ${requiredMark}` : ""}${link}\n    </Label>${description}\n  </div>\n</div>`;
+    },
   },
   {
     slug: "switch",
