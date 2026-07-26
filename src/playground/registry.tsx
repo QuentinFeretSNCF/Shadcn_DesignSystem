@@ -205,6 +205,7 @@ const TYPE_PLACEHOLDERS: Record<string, string> = {
 
 function InputFieldDemo({
   label,
+  showLabel,
   helpText,
   showHelpText,
   requirement,
@@ -214,6 +215,7 @@ function InputFieldDemo({
   disabled,
 }: {
   label: string;
+  showLabel: boolean;
   helpText: string;
   showHelpText: boolean;
   requirement: "required" | "optional" | "none";
@@ -230,7 +232,7 @@ function InputFieldDemo({
   return (
     <FieldGroup className="w-72">
       <Field>
-        <FieldLabel htmlFor={id}>
+        <FieldLabel htmlFor={id} className={cn(!showLabel && "sr-only")}>
           {label}
           {requirement === "required" && <span className="text-destructive ml-0.5">*</span>}
           {requirement === "optional" && (
@@ -508,6 +510,7 @@ export const demos: ComponentDemo[] = [
     description: "Champ de saisie texte, avec label, texte d'aide, indicateur requis/optionnel, compteur de caractères et indice de format.",
     controls: [
       { key: "label", label: "label", type: "text", default: "Adresse email" },
+      { key: "showLabel", label: "afficher le label", type: "boolean", default: true },
       { key: "showHelpText", label: "afficher le texte d'aide", type: "boolean", default: true },
       { key: "helpText", label: "texte d'aide", type: "text", default: "Utilisée uniquement pour la connexion et les notifications." },
       { key: "requirement", label: "requirement", type: "select", options: ["required", "optional", "none"], default: "required" },
@@ -519,6 +522,7 @@ export const demos: ComponentDemo[] = [
     render: (v) => (
       <InputFieldDemo
         label={bt(v, "label")}
+        showLabel={bb(v, "showLabel")}
         helpText={bt(v, "helpText")}
         showHelpText={bb(v, "showHelpText")}
         requirement={bv(v, "requirement") as "required" | "optional" | "none"}
@@ -533,8 +537,9 @@ export const demos: ComponentDemo[] = [
       const type = bv(v, "type");
       const maxLength = Number(v.maxLength);
       const requiredMark = requirement === "required" ? `<span className="text-destructive ml-0.5">*</span>` : requirement === "optional" ? `<span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>` : "";
+      const labelClass = bb(v, "showLabel") ? "" : " className=\"sr-only\"";
       const helpLine = bb(v, "showHelpText") ? `\n  <FieldDescription>${bt(v, "helpText")}</FieldDescription>` : "";
-      return `<Field>\n  <FieldLabel htmlFor="email">\n    ${bt(v, "label")}${requiredMark ? `\n    ${requiredMark}` : ""}\n  </FieldLabel>${helpLine}\n  <Input\n    id="email"\n    type="${type}"\n    maxLength={${maxLength}}\n    value={value}\n    onChange={(e) => setValue(e.target.value)}\n  />\n  <div className="flex items-start justify-between gap-4">\n    <FieldDescription>${FORMAT_HINTS[type] ?? ""}</FieldDescription>\n    ${bb(v, "showCounter") ? `<span className="text-muted-foreground text-xs tabular-nums">{value.length} / ${maxLength}</span>` : ""}\n  </div>\n</Field>`;
+      return `<Field>\n  <FieldLabel htmlFor="email"${labelClass}>\n    ${bt(v, "label")}${requiredMark ? `\n    ${requiredMark}` : ""}\n  </FieldLabel>${helpLine}\n  <Input\n    id="email"\n    type="${type}"\n    maxLength={${maxLength}}\n    value={value}\n    onChange={(e) => setValue(e.target.value)}\n  />\n  <div className="flex items-start justify-between gap-4">\n    <FieldDescription>${FORMAT_HINTS[type] ?? ""}</FieldDescription>\n    ${bb(v, "showCounter") ? `<span className="text-muted-foreground text-xs tabular-nums">{value.length} / ${maxLength}</span>` : ""}\n  </div>\n</Field>`;
     },
     states: INPUT_STATES,
   },
