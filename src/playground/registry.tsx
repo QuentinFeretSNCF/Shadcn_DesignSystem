@@ -533,15 +533,11 @@ function CheckboxFieldDemo({
 }) {
   const id = useId();
   return (
-    <div className="flex w-80 items-start gap-2">
-      <Checkbox id={id} defaultChecked={checked} disabled={disabled} className="mt-0.5" />
+    <div className="flex w-80 items-center gap-2">
+      <Checkbox id={id} defaultChecked={checked} disabled={disabled} />
       <div className="grid gap-1 leading-none">
         <Label htmlFor={id}>
           {label}
-          {requirement === "required" && <span className="text-destructive ml-0.5">*</span>}
-          {requirement === "optional" && (
-            <span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>
-          )}
           {showLink && (
             <>
               {" "}
@@ -554,6 +550,10 @@ function CheckboxFieldDemo({
               </a>
             </>
           )}
+          {requirement === "required" && <span className="text-destructive ml-0.5">*</span>}
+          {requirement === "optional" && (
+            <span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>
+          )}
         </Label>
         {showDescription && description && (
           <p className="text-muted-foreground text-sm font-normal">{description}</p>
@@ -562,6 +562,16 @@ function CheckboxFieldDemo({
     </div>
   );
 }
+
+const CHECKBOX_STATES: ComponentDemo["states"] = [
+  { name: "Enabled", render: () => <Checkbox /> },
+  { name: "Hovered", render: () => <Checkbox className="border-ring/60" /> },
+  { name: "Pressed", render: () => <Checkbox className="scale-95 border-ring/60" /> },
+  { name: "Selected", render: () => <Checkbox defaultChecked /> },
+  { name: "Disabled", render: () => <Checkbox disabled /> },
+  { name: "Read only", render: () => <Checkbox checked readOnly /> },
+  { name: "Error", render: () => <Checkbox aria-invalid="true" /> },
+];
 
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
@@ -702,8 +712,9 @@ export const demos: ComponentDemo[] = [
       const requiredMark = requirement === "required" ? `<span className="text-destructive ml-0.5">*</span>` : requirement === "optional" ? `<span className="text-muted-foreground ml-1 text-xs font-normal">(optionnel)</span>` : "";
       const link = bb(v, "showLink") ? ` <a href="#" className="text-primary underline underline-offset-4">${bt(v, "linkText")}</a>` : "";
       const description = bb(v, "showDescription") ? `\n    <p className="text-muted-foreground text-sm font-normal">${bt(v, "description")}</p>` : "";
-      return `<div className="flex items-start gap-2">\n  <Checkbox id="terms"${bb(v, "checked") ? " defaultChecked" : ""}${bb(v, "disabled") ? " disabled" : ""} />\n  <div className="grid gap-1 leading-none">\n    <Label htmlFor="terms">\n      ${bt(v, "text")}${requiredMark ? ` ${requiredMark}` : ""}${link}\n    </Label>${description}\n  </div>\n</div>`;
+      return `<div className="flex items-center gap-2">\n  <Checkbox id="terms"${bb(v, "checked") ? " defaultChecked" : ""}${bb(v, "disabled") ? " disabled" : ""} />\n  <div className="grid gap-1 leading-none">\n    <Label htmlFor="terms">\n      ${bt(v, "text")}${link}${requiredMark ? ` ${requiredMark}` : ""}\n    </Label>${description}\n  </div>\n</div>`;
     },
+    states: CHECKBOX_STATES,
   },
   {
     slug: "switch",
