@@ -185,6 +185,7 @@ import {
   AlertCircle,
   LayoutGrid,
   List,
+  ArrowRight,
 } from "lucide-react";
 import { Bar, BarChart, XAxis } from "recharts";
 
@@ -440,6 +441,25 @@ const SEGMENTED_CONTROL_STATES: ComponentDemo["states"] = [
   },
 ];
 
+const BUTTON_STATES: ComponentDemo["states"] = [
+  { name: "Enabled", render: () => <Button>Bouton</Button> },
+  {
+    name: "Hovered",
+    render: () => <Button className="bg-primary/90">Bouton</Button>,
+  },
+  {
+    name: "Focused",
+    render: () => <Button className={FORCED_RING}>Bouton</Button>,
+  },
+  {
+    name: "Pressed",
+    render: () => <Button className="scale-[0.98] bg-primary/90">Bouton</Button>,
+  },
+  { name: "Disabled", render: () => <Button disabled>Bouton</Button> },
+  { name: "Selected", render: () => <Button selected>Bouton</Button> },
+  { name: "Loading", render: () => <Button loading>Bouton</Button> },
+];
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -452,13 +472,22 @@ export const demos: ComponentDemo[] = [
       { key: "size", label: "size", type: "select", options: ["default", "xs", "sm", "lg", "icon"], default: "default" },
       { key: "disabled", label: "disabled", type: "boolean", default: false },
       { key: "text", label: "label", type: "text", default: "Bouton" },
+      { key: "iconLeft", label: "icône à gauche", type: "boolean", default: false },
+      { key: "iconRight", label: "icône à droite", type: "boolean", default: false },
     ],
     render: (v) => (
       <Button variant={bv(v, "variant") as any} size={bv(v, "size") as any} disabled={bb(v, "disabled")}>
+        {bb(v, "iconLeft") && <Plus />}
         {bt(v, "text")}
+        {bb(v, "iconRight") && <ArrowRight />}
       </Button>
     ),
-    code: (v) => `<Button variant="${bv(v, "variant")}" size="${bv(v, "size")}"${bb(v, "disabled") ? " disabled" : ""}>\n  ${bt(v, "text")}\n</Button>`,
+    code: (v) => {
+      const left = bb(v, "iconLeft") ? `\n    <Plus />` : "";
+      const right = bb(v, "iconRight") ? `\n    <ArrowRight />` : "";
+      return `<Button variant="${bv(v, "variant")}" size="${bv(v, "size")}"${bb(v, "disabled") ? " disabled" : ""}>${left}\n    ${bt(v, "text")}${right}\n</Button>`;
+    },
+    states: BUTTON_STATES,
   },
   {
     slug: "badge",
