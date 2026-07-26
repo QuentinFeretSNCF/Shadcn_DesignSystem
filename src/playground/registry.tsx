@@ -462,6 +462,56 @@ const BUTTON_STATES: ComponentDemo["states"] = [
   { name: "Loading", render: () => <Button loading>Bouton</Button> },
 ];
 
+const FORM_FIELD_POOL: {
+  key: string;
+  label: string;
+  placeholder: string;
+  required: boolean;
+  type?: string;
+}[] = [
+  { key: "name", label: "Nom du projet", placeholder: "ex: Le Studio", required: true },
+  { key: "email", label: "Email du contact", placeholder: "nom@domaine.fr", required: true, type: "email" },
+  { key: "description", label: "Description", placeholder: "Décris le projet en quelques mots", required: false },
+  { key: "deadline", label: "Date d'échéance", placeholder: "JJ/MM/AAAA", required: false },
+  { key: "priority", label: "Priorité", placeholder: "Moyenne", required: false },
+];
+
+function FormDemo({ title, fieldCount }: { title: string; fieldCount: number }) {
+  const fields = FORM_FIELD_POOL.slice(0, fieldCount);
+  const hasRequired = fields.some((f) => f.required);
+
+  return (
+    <div className="flex w-80 flex-col gap-5">
+      <div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+        {hasRequired && (
+          <p className="text-muted-foreground mt-1 text-xs">
+            Les champs avec un astérisque <span className="text-destructive">*</span> sont
+            obligatoires.
+          </p>
+        )}
+      </div>
+      <FieldGroup>
+        {fields.map((f) => (
+          <Field key={f.key}>
+            <FieldLabel htmlFor={`form-demo-${f.key}`}>
+              {f.label}
+              {f.required && <span className="text-destructive ml-0.5">*</span>}
+            </FieldLabel>
+            <Input id={`form-demo-${f.key}`} type={f.type ?? "text"} placeholder={f.placeholder} />
+          </Field>
+        ))}
+      </FieldGroup>
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline">
+          Annuler
+        </Button>
+        <Button type="submit">Envoyer</Button>
+      </div>
+    </div>
+  );
+}
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -807,19 +857,32 @@ export const demos: ComponentDemo[] = [
     slug: "form",
     name: "Form",
     category: "Inputs & Forms",
-    description: "Intégration react-hook-form + zod (voir le code source pour le schéma complet).",
-    controls: [],
-    render: () => (
-      <div className="flex w-72 flex-col gap-4">
-        <Field>
-          <FieldLabel htmlFor="form-demo-username">Nom d'utilisateur</FieldLabel>
-          <Input id="form-demo-username" placeholder="ex: quentin" />
-          <FieldDescription>Ceci est ton nom public.</FieldDescription>
-        </Field>
-        <Button type="submit" className="w-fit">Envoyer</Button>
-      </div>
+    description: "Formulaire complet : titre, mention des champs obligatoires, nombre de champs configurable et actions Annuler/Envoyer. Intégration react-hook-form + zod (voir le code).",
+    controls: [
+      { key: "title", label: "titre", type: "text", default: "Créer un projet" },
+      { key: "fieldCount", label: "nombre de champs", type: "number", default: 2, min: 2, max: FORM_FIELD_POOL.length },
+    ],
+    render: (v) => (
+      <FormDemo
+        title={bt(v, "title")}
+        fieldCount={Math.min(Math.max(Number(v.fieldCount), 2), FORM_FIELD_POOL.length)}
+      />
     ),
-    code: () => `const form = useForm({ resolver: zodResolver(schema) })\n\n<Form {...form}>\n  <form onSubmit={form.handleSubmit(onSubmit)}>\n    <FormField name="username" render={({ field }) => (\n      <FormItem>\n        <FormLabel>Nom d'utilisateur</FormLabel>\n        <FormControl><Input {...field} /></FormControl>\n        <FormMessage />\n      </FormItem>\n    )} />\n  </form>\n</Form>`,
+    code: (v) => {
+      const fieldCount = Math.min(Math.max(Number(v.fieldCount), 2), FORM_FIELD_POOL.length);
+      const fields = FORM_FIELD_POOL.slice(0, fieldCount);
+      const hasRequired = fields.some((f) => f.required);
+      const mention = hasRequired
+        ? `\n    <p className="text-muted-foreground mt-1 text-xs">\n      Les champs avec un astérisque * sont obligatoires.\n    </p>`
+        : "";
+      const fieldsCode = fields
+        .map(
+          (f) =>
+            `\n    <FormField name="${f.key}" render={({ field }) => (\n      <FormItem>\n        <FormLabel>${f.label}${f.required ? " *" : ""}</FormLabel>\n        <FormControl><Input {...field} /></FormControl>\n        <FormMessage />\n      </FormItem>\n    )} />`
+        )
+        .join("");
+      return `const form = useForm({ resolver: zodResolver(schema) })\n\n<Form {...form}>\n  <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">\n    <h3 className="text-lg font-semibold">${bt(v, "title")}</h3>${mention}${fieldsCode}\n    <div className="flex justify-end gap-2">\n      <Button type="button" variant="outline" onClick={onCancel}>Annuler</Button>\n      <Button type="submit">Envoyer</Button>\n    </div>\n  </form>\n</Form>`;
+    },
   },
 
   // ---------- Layout & Display ----------
