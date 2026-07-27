@@ -1349,7 +1349,7 @@ export const demos: ComponentDemo[] = [
     description: "Barre latérale de navigation complète et composable : repli/dépli via le trigger, menus déroulants, en-tête produit et pied avec l'utilisateur connecté.",
     controls: [],
     render: () => (
-      <SidebarProvider className="relative border-border !min-h-0 h-[30rem] w-full max-w-md overflow-hidden rounded-md border">
+      <SidebarProvider className="relative border-border !min-h-0 h-[36rem] w-full max-w-md overflow-hidden rounded-md border">
         <Sidebar collapsible="icon" className="!absolute !inset-y-0 !h-full">
           <SidebarHeader>
             <div className="flex items-center gap-2 px-2 py-1.5">

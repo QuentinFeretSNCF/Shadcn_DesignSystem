@@ -46,7 +46,7 @@ export function Playground({ demo }: { demo: ComponentDemo }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_280px]">
-        <div className="border-border bg-card flex min-h-[280px] items-center justify-center rounded-lg border p-10">
+        <div className="border-border bg-card flex min-h-[280px] min-w-0 items-center justify-center overflow-x-auto rounded-lg border p-10">
           <div key={JSON.stringify(values)}>{demo.render(values)}</div>
         </div>
 
