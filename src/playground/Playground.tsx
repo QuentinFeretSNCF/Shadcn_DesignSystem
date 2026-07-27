@@ -22,6 +22,7 @@ function defaultsFor(demo: ComponentDemo): ControlValues {
 export function Playground({ demo }: { demo: ComponentDemo }) {
   const [values, setValues] = useState<ControlValues>(() => defaultsFor(demo));
   const [copied, setCopied] = useState(false);
+  const [bgColor, setBgColor] = useState("");
   const code = useMemo(() => demo.code(values), [demo, values]);
 
   function set(key: string, value: string | boolean | number) {
@@ -46,8 +47,39 @@ export function Playground({ demo }: { demo: ComponentDemo }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_280px]">
-        <div className="border-border bg-card flex min-h-[280px] min-w-0 items-center justify-center overflow-x-auto rounded-lg border p-10">
-          <div key={JSON.stringify(values)}>{demo.render(values)}</div>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Aperçu</span>
+            <div className="flex items-center gap-1">
+              <label className="border-input relative flex size-7 cursor-pointer items-center justify-center overflow-hidden rounded-md border">
+                <span
+                  className="pointer-events-none absolute inset-0"
+                  style={{ backgroundColor: bgColor || "var(--card)" }}
+                />
+                <input
+                  type="color"
+                  value={bgColor || "#ffffff"}
+                  onChange={(e) => setBgColor(e.target.value)}
+                  className="absolute inset-0 size-full cursor-pointer opacity-0"
+                  title="Couleur de fond de l'aperçu"
+                />
+              </label>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setBgColor("")}
+                title="Réinitialiser la couleur de fond"
+              >
+                <RotateCcw />
+              </Button>
+            </div>
+          </div>
+          <div
+            className="border-border bg-card flex min-h-[280px] min-w-0 items-center justify-center overflow-x-auto rounded-lg border p-10"
+            style={bgColor ? { backgroundColor: bgColor } : undefined}
+          >
+            <div key={JSON.stringify(values)}>{demo.render(values)}</div>
+          </div>
         </div>
 
         <div className="border-border flex flex-col gap-4 rounded-lg border p-4">
