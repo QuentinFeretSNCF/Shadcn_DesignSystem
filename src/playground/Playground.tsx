@@ -138,7 +138,7 @@ export function Playground({ demo }: { demo: ComponentDemo }) {
             {copied ? "Copié" : "Copier"}
           </Button>
         </div>
-        <pre className="overflow-x-auto p-4 text-sm">
+        <pre className="overflow-hidden p-4 text-sm whitespace-pre-wrap break-words">
           <code>{code}</code>
         </pre>
       </div>
