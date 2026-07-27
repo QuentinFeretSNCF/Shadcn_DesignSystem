@@ -110,6 +110,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
+import { SidePanel } from "@/components/ui/side-panel";
 import { SegmentedControl, type SegmentedControlOption } from "@/components/ui/segmented-control";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
@@ -590,6 +591,49 @@ const CHECKBOX_STATES: ComponentDemo["states"] = [
   { name: "Read only", render: () => <Checkbox checked readOnly /> },
   { name: "Error", render: () => <Checkbox aria-invalid="true" /> },
 ];
+
+function SidePanelDemo({
+  title,
+  description,
+  primaryLabel,
+  secondaryLabel,
+}: {
+  title: string;
+  description: string;
+  primaryLabel: string;
+  secondaryLabel: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Ouvrir le panneau
+      </Button>
+      <SidePanel
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        description={description}
+        actions={[
+          { label: secondaryLabel, variant: "secondary", onClick: () => setOpen(false) },
+          { label: primaryLabel, variant: "primary", onClick: () => setOpen(false) },
+        ]}
+      >
+        <div className="flex flex-col gap-4 py-4">
+          <Field>
+            <FieldLabel htmlFor={`${id}-name`}>Nom du projet</FieldLabel>
+            <Input id={`${id}-name`} placeholder="ex: Le Studio" />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor={`${id}-desc`}>Description</FieldLabel>
+            <Textarea id={`${id}-desc`} placeholder="Décris le projet en quelques mots" />
+          </Field>
+        </div>
+      </SidePanel>
+    </>
+  );
+}
 
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
@@ -1580,6 +1624,27 @@ export const demos: ComponentDemo[] = [
       </Sheet>
     ),
     code: (v) => `<Sheet>\n  <SheetTrigger asChild><Button variant="outline">Ouvrir</Button></SheetTrigger>\n  <SheetContent side="${bv(v, "side")}">\n    <SheetHeader>\n      <SheetTitle>Détail de la tâche</SheetTitle>\n    </SheetHeader>\n  </SheetContent>\n</Sheet>`,
+  },
+  {
+    slug: "side-panel",
+    name: "Side Panel",
+    category: "Overlays & Popups",
+    description: "Panneau latéral collé à droite de l'écran, avec en-tête (titre, description, contenu personnalisable, bouton de fermeture), pied avec actions primaire/secondaires, overlay obligatoire et fermeture au clic extérieur. Composant maison (non fourni par shadcn/ui), construit sur Sheet.",
+    controls: [
+      { key: "title", label: "titre", type: "text", default: "Modifier le projet" },
+      { key: "description", label: "description", type: "text", default: "Mets à jour les informations puis enregistre." },
+      { key: "primaryLabel", label: "action primaire", type: "text", default: "Enregistrer" },
+      { key: "secondaryLabel", label: "action secondaire", type: "text", default: "Annuler" },
+    ],
+    render: (v) => (
+      <SidePanelDemo
+        title={bt(v, "title")}
+        description={bt(v, "description")}
+        primaryLabel={bt(v, "primaryLabel")}
+        secondaryLabel={bt(v, "secondaryLabel")}
+      />
+    ),
+    code: (v) => `const [open, setOpen] = useState(false);\n\n<Button variant="outline" onClick={() => setOpen(true)}>Ouvrir le panneau</Button>\n<SidePanel\n  open={open}\n  onOpenChange={setOpen}\n  title="${bt(v, "title")}"\n  description="${bt(v, "description")}"\n  actions={[\n    { label: "${bt(v, "secondaryLabel")}", variant: "secondary", onClick: () => setOpen(false) },\n    { label: "${bt(v, "primaryLabel")}", variant: "primary", onClick: () => setOpen(false) },\n  ]}\n>\n  {/* contenu personnalisable */}\n</SidePanel>`,
   },
   {
     slug: "drawer",
