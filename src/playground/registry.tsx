@@ -133,14 +133,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarInset,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   Select,
@@ -186,6 +190,12 @@ import {
   LayoutGrid,
   List,
   ArrowRight,
+  ChevronsUpDown,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  LogOut,
+  UserCircle,
 } from "lucide-react";
 import { Bar, BarChart, XAxis } from "recharts";
 
@@ -1328,13 +1338,21 @@ export const demos: ComponentDemo[] = [
     slug: "sidebar",
     name: "Sidebar",
     category: "Navigation",
-    description: "Barre latérale de navigation complète et composable.",
+    description: "Barre latérale de navigation complète et composable : repli/dépli via le trigger, menus déroulants, en-tête produit et pied avec l'utilisateur connecté.",
     controls: [],
     render: () => (
-      <SidebarProvider className="border-border !min-h-0 h-72 w-72 overflow-hidden rounded-md border">
-        <Sidebar collapsible="none" className="h-full">
+      <SidebarProvider className="relative border-border !min-h-0 h-96 w-full max-w-md overflow-hidden rounded-md border">
+        <Sidebar collapsible="icon" className="!absolute !inset-y-0 !h-full">
           <SidebarHeader>
-            <span className="px-2 text-sm font-semibold">Le Studio</span>
+            <div className="flex items-center gap-2 px-2 py-1.5">
+              <div className="bg-primary text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-md">
+                <LayoutGrid className="size-4" />
+              </div>
+              <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate text-sm font-semibold">Le Studio</span>
+                <span className="text-muted-foreground truncate text-xs">Design system Kanban</span>
+              </div>
+            </div>
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
@@ -1342,23 +1360,90 @@ export const demos: ComponentDemo[] = [
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive>
-                      <Home /> Kanban
+                    <SidebarMenuButton isActive tooltip="Kanban">
+                      <Home /> <span>Kanban</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <Terminal /> Sprints
+                    <SidebarMenuButton tooltip="Sprints">
+                      <Terminal /> <span>Sprints</span>
                     </SidebarMenuButton>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuAction showOnHover>
+                          <MoreHorizontal />
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem>
+                          <Pencil /> Renommer
+                        </DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive">
+                          <Trash2 /> Supprimer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton size="lg">
+                      <Avatar className="size-8 rounded-md">
+                        <AvatarFallback className="rounded-md">QF</AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+                        <span className="truncate text-sm font-medium">Quentin Feret</span>
+                        <span className="text-muted-foreground truncate text-xs">
+                          quentin.feret@lestudio.fr
+                        </span>
+                      </div>
+                      <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="top" align="start" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="grid text-left leading-tight">
+                        <span className="text-sm font-medium">Quentin Feret</span>
+                        <span className="text-muted-foreground text-xs">
+                          quentin.feret@lestudio.fr
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <UserCircle /> Profil
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings /> Paramètres
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive">
+                      <LogOut /> Se déconnecter
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
         </Sidebar>
+        <SidebarInset>
+          <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
+            <SidebarTrigger />
+            <span className="text-sm font-medium">Kanban</span>
+          </div>
+          <div className="text-muted-foreground flex flex-1 items-center justify-center p-4 text-sm">
+            Contenu de la page
+          </div>
+        </SidebarInset>
       </SidebarProvider>
     ),
-    code: () => `<SidebarProvider>\n  <Sidebar>\n    <SidebarHeader>Le Studio</SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Vues</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive>Kanban</SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n  </Sidebar>\n</SidebarProvider>`,
+    code: () => `<SidebarProvider>\n  <Sidebar collapsible="icon">\n    <SidebarHeader>\n      <div className="flex items-center gap-2 px-2 py-1.5">\n        <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">\n          <LayoutGrid className="size-4" />\n        </div>\n        <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">\n          <span className="text-sm font-semibold">Le Studio</span>\n          <span className="text-muted-foreground text-xs">Design system Kanban</span>\n        </div>\n      </div>\n    </SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Vues</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive tooltip="Kanban"><Home /> Kanban</SidebarMenuButton>\n            </SidebarMenuItem>\n            <SidebarMenuItem>\n              <SidebarMenuButton tooltip="Sprints"><Terminal /> Sprints</SidebarMenuButton>\n              <DropdownMenu>\n                <DropdownMenuTrigger asChild>\n                  <SidebarMenuAction showOnHover><MoreHorizontal /></SidebarMenuAction>\n                </DropdownMenuTrigger>\n                <DropdownMenuContent side="right" align="start">\n                  <DropdownMenuItem><Pencil /> Renommer</DropdownMenuItem>\n                  <DropdownMenuItem variant="destructive"><Trash2 /> Supprimer</DropdownMenuItem>\n                </DropdownMenuContent>\n              </DropdownMenu>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n    <SidebarFooter>\n      <SidebarMenu>\n        <SidebarMenuItem>\n          <DropdownMenu>\n            <DropdownMenuTrigger asChild>\n              <SidebarMenuButton size="lg">\n                <Avatar className="size-8 rounded-md"><AvatarFallback>QF</AvatarFallback></Avatar>\n                <div className="grid flex-1 text-left leading-tight">\n                  <span className="text-sm font-medium">Quentin Feret</span>\n                  <span className="text-muted-foreground text-xs">quentin.feret@lestudio.fr</span>\n                </div>\n                <ChevronsUpDown className="ml-auto size-4" />\n              </SidebarMenuButton>\n            </DropdownMenuTrigger>\n            <DropdownMenuContent side="top" align="start">\n              <DropdownMenuItem><UserCircle /> Profil</DropdownMenuItem>\n              <DropdownMenuItem><Settings /> Paramètres</DropdownMenuItem>\n              <DropdownMenuSeparator />\n              <DropdownMenuItem variant="destructive"><LogOut /> Se déconnecter</DropdownMenuItem>\n            </DropdownMenuContent>\n          </DropdownMenu>\n        </SidebarMenuItem>\n      </SidebarMenu>\n    </SidebarFooter>\n  </Sidebar>\n  <SidebarInset>\n    <div className="flex h-12 items-center gap-2 border-b px-3">\n      <SidebarTrigger />\n      <span className="text-sm font-medium">Kanban</span>\n    </div>\n  </SidebarInset>\n</SidebarProvider>`,
   },
   {
     slug: "menubar",
