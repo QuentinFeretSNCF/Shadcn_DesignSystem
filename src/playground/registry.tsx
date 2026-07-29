@@ -203,6 +203,7 @@ import {
   FolderKanban,
   Users,
   ChevronDown,
+  Check,
   LogOut,
   UserCircle,
 } from "lucide-react";
@@ -668,13 +669,29 @@ export const demos: ComponentDemo[] = [
     slug: "badge",
     name: "Badge",
     category: "Inputs & Forms",
-    description: "Affiche un petit statut ou compteur.",
+    description: "Affiche un petit statut ou compteur, avec une icône optionnelle à gauche (data-icon=\"inline-start\") ou à droite (data-icon=\"inline-end\") du label.",
     controls: [
       { key: "variant", label: "variant", type: "select", options: ["default", "secondary", "destructive", "outline", "ghost", "link"], default: "default" },
-      { key: "text", label: "label", type: "text", default: "Badge" },
+      { key: "text", label: "label", type: "text", default: "Vérifié" },
+      { key: "icon", label: "icône", type: "select", options: ["none", "inline-start", "inline-end"], default: "inline-start" },
     ],
-    render: (v) => <Badge variant={bv(v, "variant") as any}>{bt(v, "text")}</Badge>,
-    code: (v) => `<Badge variant="${bv(v, "variant")}">${bt(v, "text")}</Badge>`,
+    render: (v) => {
+      const icon = bv(v, "icon");
+      return (
+        <Badge
+          variant={bv(v, "variant") as any}
+          icon={icon !== "none" ? <Check /> : undefined}
+          iconPosition={icon !== "none" ? (icon as "inline-start" | "inline-end") : undefined}
+        >
+          {bt(v, "text")}
+        </Badge>
+      );
+    },
+    code: (v) => {
+      const icon = bv(v, "icon");
+      const iconProps = icon !== "none" ? ` icon={<Check />} iconPosition="${icon}"` : "";
+      return `<Badge variant="${bv(v, "variant")}"${iconProps}>${bt(v, "text")}</Badge>`;
+    },
   },
   {
     slug: "input",

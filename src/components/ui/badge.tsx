@@ -30,18 +30,38 @@ function Badge({
   className,
   variant = "default",
   asChild = false,
+  icon,
+  iconPosition = "inline-start",
+  children,
   ...props
 }: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  VariantProps<typeof badgeVariants> & {
+    asChild?: boolean
+    /** Icon rendered inline with the label. */
+    icon?: React.ReactNode
+    /** Where `icon` is placed relative to the label. */
+    iconPosition?: "inline-start" | "inline-end"
+  }) {
   const Comp = asChild ? Slot.Root : "span"
 
   return (
     <Comp
       data-slot="badge"
       data-variant={variant}
+      data-icon={icon ? iconPosition : undefined}
       className={cn(badgeVariants({ variant }), className)}
       {...props}
-    />
+    >
+      {!asChild && icon ? (
+        <>
+          {iconPosition === "inline-start" && icon}
+          {children}
+          {iconPosition === "inline-end" && icon}
+        </>
+      ) : (
+        children
+      )}
+    </Comp>
   )
 }
 
