@@ -1,4 +1,4 @@
-import { useId, useState, type ComponentProps } from "react";
+import { useId, useState, type ComponentProps, type MouseEvent } from "react";
 import type { ComponentDemo, ControlValues } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -204,6 +204,7 @@ import {
   Users,
   ChevronDown,
   Check,
+  X,
   LogOut,
   UserCircle,
 } from "lucide-react";
@@ -633,6 +634,66 @@ function SidePanelDemo({
         </div>
       </SidePanel>
     </>
+  );
+}
+
+interface TabItem {
+  value: string;
+  label: string;
+  content: string;
+}
+
+const INITIAL_TABS: TabItem[] = [
+  { value: "kanban", label: "Kanban", content: "Vue Kanban." },
+  { value: "sprints", label: "Sprints", content: "Vue Sprints." },
+  { value: "calendrier", label: "Calendrier", content: "Vue Calendrier." },
+];
+
+function TabsDemo() {
+  const [tabs, setTabs] = useState<TabItem[]>(INITIAL_TABS);
+  const [active, setActive] = useState(INITIAL_TABS[0].value);
+
+  function closeTab(event: MouseEvent, value: string) {
+    event.stopPropagation();
+    event.preventDefault();
+    setTabs((prev) => {
+      const next = prev.filter((t) => t.value !== value);
+      if (active === value && next.length > 0) {
+        setActive(next[0].value);
+      }
+      return next;
+    });
+  }
+
+  if (tabs.length === 0) {
+    return (
+      <p className="text-muted-foreground text-sm">Tous les onglets sont fermés.</p>
+    );
+  }
+
+  return (
+    <Tabs value={active} onValueChange={setActive} className="w-80">
+      <TabsList variant="line">
+        {tabs.map((tab) => (
+          <TabsTrigger key={tab.value} value={tab.value}>
+            {tab.label}
+            <span
+              role="button"
+              tabIndex={-1}
+              className="hover:bg-muted-foreground/20 rounded-xs"
+              onClick={(e) => closeTab(e, tab.value)}
+            >
+              <X className="size-3" />
+            </span>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {tabs.map((tab) => (
+        <TabsContent key={tab.value} value={tab.value} className="text-sm">
+          {tab.content}
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 }
 
@@ -1330,19 +1391,10 @@ export const demos: ComponentDemo[] = [
     slug: "tabs",
     name: "Tabs",
     category: "Navigation",
-    description: "Bascule entre plusieurs vues de contenu.",
+    description: "Bascule entre plusieurs vues de contenu. Variant \"line\" (soulignement) avec une icône de fermeture à droite de chaque libellé.",
     controls: [],
-    render: () => (
-      <Tabs defaultValue="kanban" className="w-72">
-        <TabsList>
-          <TabsTrigger value="kanban">Kanban</TabsTrigger>
-          <TabsTrigger value="sprints">Sprints</TabsTrigger>
-        </TabsList>
-        <TabsContent value="kanban" className="text-sm">Vue Kanban.</TabsContent>
-        <TabsContent value="sprints" className="text-sm">Vue Sprints.</TabsContent>
-      </Tabs>
-    ),
-    code: () => `<Tabs defaultValue="kanban">\n  <TabsList>\n    <TabsTrigger value="kanban">Kanban</TabsTrigger>\n    <TabsTrigger value="sprints">Sprints</TabsTrigger>\n  </TabsList>\n  <TabsContent value="kanban">...</TabsContent>\n</Tabs>`,
+    render: () => <TabsDemo />,
+    code: () => `<Tabs value={active} onValueChange={setActive}>\n  <TabsList variant="line">\n    {tabs.map((tab) => (\n      <TabsTrigger key={tab.value} value={tab.value}>\n        {tab.label}\n        <span onClick={(e) => closeTab(e, tab.value)}>\n          <X className="size-3" />\n        </span>\n      </TabsTrigger>\n    ))}\n  </TabsList>\n  {tabs.map((tab) => (\n    <TabsContent key={tab.value} value={tab.value}>{tab.content}</TabsContent>\n  ))}\n</Tabs>`,
   },
   {
     slug: "breadcrumb",
