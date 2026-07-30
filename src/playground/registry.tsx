@@ -1,4 +1,4 @@
-import { useId, useState, type ComponentProps, type MouseEvent } from "react";
+import { useId, useRef, useState, type ComponentProps, type MouseEvent } from "react";
 import type { ComponentDemo, ControlValues } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -652,6 +652,7 @@ const INITIAL_TABS: TabItem[] = [
 function TabsDemo() {
   const [tabs, setTabs] = useState<TabItem[]>(INITIAL_TABS);
   const [active, setActive] = useState(INITIAL_TABS[0].value);
+  const nextId = useRef(1);
 
   function closeTab(event: MouseEvent, value: string) {
     event.stopPropagation();
@@ -665,29 +666,38 @@ function TabsDemo() {
     });
   }
 
-  if (tabs.length === 0) {
-    return (
-      <p className="text-muted-foreground text-sm">Tous les onglets sont fermés.</p>
-    );
+  function addTab() {
+    const value = `nouvel-onglet-${nextId.current++}`;
+    const label = `Nouvel onglet ${nextId.current - 1}`;
+    setTabs((prev) => [...prev, { value, label, content: `Contenu de ${label}.` }]);
+    setActive(value);
   }
 
   return (
     <Tabs value={active} onValueChange={setActive} className="w-80">
-      <TabsList variant="line">
-        {tabs.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value}>
-            {tab.label}
-            <span
-              role="button"
-              tabIndex={-1}
-              className="hover:bg-muted-foreground/20 rounded-xs"
-              onClick={(e) => closeTab(e, tab.value)}
-            >
-              <X className="size-3" />
-            </span>
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="flex items-center gap-1">
+        <TabsList variant="line" className="flex-1 justify-start">
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+              <span
+                role="button"
+                tabIndex={-1}
+                className="hover:bg-muted-foreground/20 rounded-xs"
+                onClick={(e) => closeTab(e, tab.value)}
+              >
+                <X className="size-3" />
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <Button variant="ghost" size="icon-sm" onClick={addTab} title="Ajouter un onglet">
+          <Plus />
+        </Button>
+      </div>
+      {tabs.length === 0 && (
+        <p className="text-muted-foreground text-sm">Tous les onglets sont fermés.</p>
+      )}
       {tabs.map((tab) => (
         <TabsContent key={tab.value} value={tab.value} className="text-sm">
           {tab.content}
@@ -1394,7 +1404,7 @@ export const demos: ComponentDemo[] = [
     description: "Bascule entre plusieurs vues de contenu. Variant \"line\" (soulignement) avec une icône de fermeture à droite de chaque libellé.",
     controls: [],
     render: () => <TabsDemo />,
-    code: () => `<Tabs value={active} onValueChange={setActive}>\n  <TabsList variant="line">\n    {tabs.map((tab) => (\n      <TabsTrigger key={tab.value} value={tab.value}>\n        {tab.label}\n        <span onClick={(e) => closeTab(e, tab.value)}>\n          <X className="size-3" />\n        </span>\n      </TabsTrigger>\n    ))}\n  </TabsList>\n  {tabs.map((tab) => (\n    <TabsContent key={tab.value} value={tab.value}>{tab.content}</TabsContent>\n  ))}\n</Tabs>`,
+    code: () => `<Tabs value={active} onValueChange={setActive}>\n  <div className="flex items-center gap-1">\n    <TabsList variant="line" className="flex-1 justify-start">\n      {tabs.map((tab) => (\n        <TabsTrigger key={tab.value} value={tab.value}>\n          {tab.label}\n          <span onClick={(e) => closeTab(e, tab.value)}>\n            <X className="size-3" />\n          </span>\n        </TabsTrigger>\n      ))}\n    </TabsList>\n    <Button variant="ghost" size="icon-sm" onClick={addTab}>\n      <Plus />\n    </Button>\n  </div>\n  {tabs.map((tab) => (\n    <TabsContent key={tab.value} value={tab.value}>{tab.content}</TabsContent>\n  ))}\n</Tabs>`,
   },
   {
     slug: "breadcrumb",
