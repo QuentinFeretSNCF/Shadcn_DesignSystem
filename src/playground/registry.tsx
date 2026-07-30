@@ -1346,16 +1346,66 @@ export const demos: ComponentDemo[] = [
     slug: "button-group",
     name: "Button Group",
     category: "Layout & Display",
-    description: "Regroupe plusieurs boutons visuellement.",
-    controls: [],
-    render: () => (
-      <ButtonGroup>
-        <Button variant="outline">Jour</Button>
-        <Button variant="outline">Semaine</Button>
-        <Button variant="outline">Mois</Button>
-      </ButtonGroup>
-    ),
-    code: () => `<ButtonGroup>\n  <Button variant="outline">Jour</Button>\n  <Button variant="outline">Semaine</Button>\n  <Button variant="outline">Mois</Button>\n</ButtonGroup>`,
+    description: "Regroupe plusieurs boutons ou un mélange de boutons et de champs de saisie.",
+    controls: [
+      {
+        key: "variant",
+        label: "variant",
+        type: "select",
+        options: ["buttons", "input+button", "button+input", "button+input+button"],
+        default: "buttons",
+      },
+    ],
+    render: (v) => {
+      const variant = bv(v, "variant");
+      if (variant === "input+button") {
+        return (
+          <ButtonGroup>
+            <Input type="search" placeholder="Rechercher..." />
+            <Button variant="outline" size="icon" aria-label="Rechercher">
+              <Search />
+            </Button>
+          </ButtonGroup>
+        );
+      }
+      if (variant === "button+input") {
+        return (
+          <ButtonGroup>
+            <Button variant="outline">+33</Button>
+            <Input type="tel" placeholder="6 12 34 56 78" />
+          </ButtonGroup>
+        );
+      }
+      if (variant === "button+input+button") {
+        return (
+          <ButtonGroup>
+            <Button variant="outline">€</Button>
+            <Input type="number" placeholder="0,00" />
+            <Button>Envoyer</Button>
+          </ButtonGroup>
+        );
+      }
+      return (
+        <ButtonGroup>
+          <Button variant="outline">Jour</Button>
+          <Button variant="outline">Semaine</Button>
+          <Button variant="outline">Mois</Button>
+        </ButtonGroup>
+      );
+    },
+    code: (v) => {
+      const variant = bv(v, "variant");
+      if (variant === "input+button") {
+        return `<ButtonGroup>\n  <Input type="search" placeholder="Rechercher..." />\n  <Button variant="outline" size="icon" aria-label="Rechercher">\n    <Search />\n  </Button>\n</ButtonGroup>`;
+      }
+      if (variant === "button+input") {
+        return `<ButtonGroup>\n  <Button variant="outline">+33</Button>\n  <Input type="tel" placeholder="6 12 34 56 78" />\n</ButtonGroup>`;
+      }
+      if (variant === "button+input+button") {
+        return `<ButtonGroup>\n  <Button variant="outline">€</Button>\n  <Input type="number" placeholder="0,00" />\n  <Button>Envoyer</Button>\n</ButtonGroup>`;
+      }
+      return `<ButtonGroup>\n  <Button variant="outline">Jour</Button>\n  <Button variant="outline">Semaine</Button>\n  <Button variant="outline">Mois</Button>\n</ButtonGroup>`;
+    },
   },
   {
     slug: "scroll-area",
