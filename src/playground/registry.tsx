@@ -189,6 +189,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  AlignJustify,
   Search,
   Terminal,
   AlertCircle,
@@ -707,6 +708,13 @@ function TabsDemo() {
   );
 }
 
+const TOGGLE_GROUP_ITEM_POOL = [
+  { value: "left", label: "Aligner à gauche", icon: AlignLeft, iconName: "AlignLeft" },
+  { value: "center", label: "Centrer", icon: AlignCenter, iconName: "AlignCenter" },
+  { value: "right", label: "Aligner à droite", icon: AlignRight, iconName: "AlignRight" },
+  { value: "justify", label: "Justifier", icon: AlignJustify, iconName: "AlignJustify" },
+];
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -994,36 +1002,75 @@ export const demos: ComponentDemo[] = [
     slug: "toggle",
     name: "Toggle",
     category: "Inputs & Forms",
-    description: "Bouton à deux états (pressé / non pressé).",
+    description: "Bouton à deux états (pressé / non pressé). Variant d'affichage \"withText\" pour afficher l'icône avec son libellé.",
     controls: [
       { key: "variant", label: "variant", type: "select", options: ["default", "outline"], default: "default" },
       { key: "size", label: "size", type: "select", options: ["default", "sm", "lg"], default: "default" },
+      { key: "display", label: "affichage", type: "select", options: ["icon", "withText"], default: "icon" },
       { key: "disabled", label: "disabled", type: "boolean", default: false },
     ],
-    render: (v) => (
-      <Toggle variant={bv(v, "variant") as any} size={bv(v, "size") as any} disabled={bb(v, "disabled")} aria-label="Gras">
-        <Bold />
-      </Toggle>
-    ),
-    code: (v) => `<Toggle variant="${bv(v, "variant")}" size="${bv(v, "size")}"${bb(v, "disabled") ? " disabled" : ""} aria-label="Gras">\n  <Bold />\n</Toggle>`,
+    render: (v) => {
+      const withText = bv(v, "display") === "withText";
+      return (
+        <Toggle
+          variant={bv(v, "variant") as any}
+          size={bv(v, "size") as any}
+          disabled={bb(v, "disabled")}
+          aria-label="Gras"
+        >
+          <Bold />
+          {withText && "Gras"}
+        </Toggle>
+      );
+    },
+    code: (v) => {
+      const withText = bv(v, "display") === "withText";
+      return `<Toggle variant="${bv(v, "variant")}" size="${bv(v, "size")}"${bb(v, "disabled") ? " disabled" : ""} aria-label="Gras">\n  <Bold />\n${withText ? "  Gras\n" : ""}</Toggle>`;
+    },
   },
   {
     slug: "toggle-group",
     name: "Toggle Group",
     category: "Inputs & Forms",
-    description: "Groupe de toggles, sélection simple ou multiple.",
+    description: "Groupe de toggles, sélection simple ou multiple. Variant d'affichage \"withText\" et nombre d'items configurable.",
     controls: [
       { key: "type", label: "type", type: "select", options: ["single", "multiple"], default: "single" },
       { key: "variant", label: "variant", type: "select", options: ["default", "outline"], default: "default" },
+      { key: "display", label: "affichage", type: "select", options: ["icon", "withText"], default: "icon" },
+      { key: "itemCount", label: "nombre d'items", type: "number", default: 3, min: 2, max: TOGGLE_GROUP_ITEM_POOL.length },
     ],
-    render: (v) => (
-      <ToggleGroup type={bv(v, "type") as any} variant={bv(v, "variant") as any} defaultValue={(bv(v, "type") === "single" ? "left" : ["left"]) as any}>
-        <ToggleGroupItem value="left" aria-label="Aligner à gauche"><AlignLeft /></ToggleGroupItem>
-        <ToggleGroupItem value="center" aria-label="Centrer"><AlignCenter /></ToggleGroupItem>
-        <ToggleGroupItem value="right" aria-label="Aligner à droite"><AlignRight /></ToggleGroupItem>
-      </ToggleGroup>
-    ),
-    code: (v) => `<ToggleGroup type="${bv(v, "type")}" variant="${bv(v, "variant")}">\n  <ToggleGroupItem value="left"><AlignLeft /></ToggleGroupItem>\n  <ToggleGroupItem value="center"><AlignCenter /></ToggleGroupItem>\n  <ToggleGroupItem value="right"><AlignRight /></ToggleGroupItem>\n</ToggleGroup>`,
+    render: (v) => {
+      const withText = bv(v, "display") === "withText";
+      const count = Math.min(Math.max(Number(v.itemCount), 2), TOGGLE_GROUP_ITEM_POOL.length);
+      const items = TOGGLE_GROUP_ITEM_POOL.slice(0, count);
+      const type = bv(v, "type");
+      return (
+        <ToggleGroup
+          type={type as any}
+          variant={bv(v, "variant") as any}
+          defaultValue={(type === "single" ? items[0].value : [items[0].value]) as any}
+        >
+          {items.map((item) => (
+            <ToggleGroupItem key={item.value} value={item.value} aria-label={item.label}>
+              <item.icon />
+              {withText && item.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      );
+    },
+    code: (v) => {
+      const withText = bv(v, "display") === "withText";
+      const count = Math.min(Math.max(Number(v.itemCount), 2), TOGGLE_GROUP_ITEM_POOL.length);
+      const items = TOGGLE_GROUP_ITEM_POOL.slice(0, count);
+      const itemsCode = items
+        .map(
+          (item) =>
+            `\n  <ToggleGroupItem value="${item.value}"><${item.iconName} />${withText ? ` ${item.label}` : ""}</ToggleGroupItem>`
+        )
+        .join("");
+      return `<ToggleGroup type="${bv(v, "type")}" variant="${bv(v, "variant")}">${itemsCode}\n</ToggleGroup>`;
+    },
   },
   {
     slug: "input-otp",
