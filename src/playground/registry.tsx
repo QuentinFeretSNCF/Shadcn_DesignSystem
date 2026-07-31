@@ -111,6 +111,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
 import { SidePanel } from "@/components/ui/side-panel";
+import { InternalLink, ExternalLink, DownloadLink, InlineLink } from "@/components/ui/link";
 import { SegmentedControl, type SegmentedControlOption } from "@/components/ui/segmented-control";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
@@ -1502,6 +1503,84 @@ export const demos: ComponentDemo[] = [
     controls: [],
     render: () => <TabsDemo />,
     code: () => `<Tabs value={active} onValueChange={setActive}>\n  <div className="flex items-center gap-1">\n    <TabsList variant="line" className="flex-1 justify-start">\n      {tabs.map((tab) => (\n        <TabsTrigger key={tab.value} value={tab.value}>\n          {tab.label}\n          <span onClick={(e) => closeTab(e, tab.value)}>\n            <X className="size-3" />\n          </span>\n        </TabsTrigger>\n      ))}\n    </TabsList>\n    <Button variant="ghost" size="icon-sm" onClick={addTab}>\n      <Plus />\n    </Button>\n  </div>\n  {tabs.map((tab) => (\n    <TabsContent key={tab.value} value={tab.value}>{tab.content}</TabsContent>\n  ))}\n</Tabs>`,
+  },
+  {
+    slug: "internal-link",
+    name: "Lien interne",
+    category: "Navigation",
+    description: "Texte qui navigue vers un autre emplacement du site. Basé sur Button variant=\"link\".",
+    controls: [
+      { key: "text", label: "label", type: "text", default: "Voir tous les projets" },
+    ],
+    render: (v) => (
+      <InternalLink href="#" onClick={(e) => e.preventDefault()}>
+        {bt(v, "text")}
+      </InternalLink>
+    ),
+    code: (v) => `<InternalLink href="/projets">${bt(v, "text")}</InternalLink>`,
+  },
+  {
+    slug: "external-link",
+    name: "Lien externe",
+    category: "Navigation",
+    description: "Pointe vers un autre site et s'ouvre dans un nouvel onglet. Icône obligatoire à droite du label, et tooltip obligatoire au survol (\"Label - nouvelle fenêtre\").",
+    controls: [
+      { key: "text", label: "label", type: "text", default: "Documentation shadcn/ui" },
+    ],
+    render: (v) => (
+      <ExternalLink href="#" label={bt(v, "text")} onClick={(e) => e.preventDefault()}>
+        {bt(v, "text")}
+      </ExternalLink>
+    ),
+    code: (v) => `<ExternalLink href="https://ui.shadcn.com" label="${bt(v, "text")}">\n  ${bt(v, "text")}\n</ExternalLink>`,
+  },
+  {
+    slug: "download-link",
+    name: "Lien de téléchargement",
+    category: "Navigation",
+    description: "Label \"Télécharger <fichier>\", description (format, volume, langue) et icône de téléchargement obligatoire à droite.",
+    controls: [
+      { key: "fileName", label: "nom du fichier", type: "text", default: "le rapport annuel" },
+      { key: "format", label: "format", type: "text", default: "PDF" },
+      { key: "size", label: "volume", type: "text", default: "2,4 Mo" },
+      { key: "lang", label: "langue", type: "text", default: "Français" },
+    ],
+    render: (v) => (
+      <DownloadLink
+        href="#"
+        fileName={bt(v, "fileName")}
+        format={bt(v, "format")}
+        size={bt(v, "size")}
+        lang={bt(v, "lang")}
+        onClick={(e) => e.preventDefault()}
+      />
+    ),
+    code: (v) => `<DownloadLink\n  href="/fichiers/rapport.pdf"\n  fileName="${bt(v, "fileName")}"\n  format="${bt(v, "format")}"\n  size="${bt(v, "size")}"\n  lang="${bt(v, "lang")}"\n/>`,
+  },
+  {
+    slug: "inline-link",
+    name: "Lien au fil du paragraphe",
+    category: "Navigation",
+    description: "Lien souligné intégré à un paragraphe de texte. S'il est externe, ajoute l'icône et le tooltip obligatoires (\"Label - nouvelle fenêtre\").",
+    controls: [
+      { key: "external", label: "externe", type: "boolean", default: true },
+    ],
+    render: (v) => {
+      const external = bb(v, "external");
+      return (
+        <p className="max-w-sm text-sm leading-relaxed">
+          Consulte notre{" "}
+          <InlineLink href="#" external={external} label="guide de contribution" onClick={(e) => e.preventDefault()}>
+            guide de contribution
+          </InlineLink>{" "}
+          avant de proposer un nouveau composant.
+        </p>
+      );
+    },
+    code: (v) => {
+      const external = bb(v, "external");
+      return `<p>\n  Consulte notre <InlineLink href="/guide"${external ? " external label=\"guide de contribution\"" : ""}>guide de contribution</InlineLink> avant de proposer un nouveau composant.\n</p>`;
+    },
   },
   {
     slug: "breadcrumb",
