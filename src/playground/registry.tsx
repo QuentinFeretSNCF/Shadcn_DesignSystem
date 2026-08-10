@@ -3,7 +3,7 @@ import type { ComponentDemo, ControlValues } from "./types";
 import { cn } from "@/lib/utils";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertActions, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -2072,20 +2072,46 @@ export const demos: ComponentDemo[] = [
     slug: "alert",
     name: "Alert",
     category: "Feedback",
-    description: "Message contextuel court (info, erreur, etc.).",
+    description: "Message contextuel court (info, erreur, etc.), avec un à deux boutons d'actions optionnels.",
     controls: [
       { key: "variant", label: "variant", type: "select", options: ["default", "destructive"], default: "default" },
       { key: "title", label: "titre", type: "text", default: "Attention" },
       { key: "description", label: "description", type: "text", default: "Vérifie les dates avant de publier le sprint." },
+      { key: "showActions", label: "afficher les actions", type: "boolean", default: true },
+      { key: "primaryLabel", label: "action primaire", type: "text", default: "Publier" },
+      { key: "secondaryLabel", label: "action secondaire (optionnelle)", type: "text", default: "Annuler" },
     ],
-    render: (v) => (
-      <Alert variant={bv(v, "variant") as any} className="w-80">
-        <AlertCircle className="size-4" />
-        <AlertTitle>{bt(v, "title")}</AlertTitle>
-        <AlertDescription>{bt(v, "description")}</AlertDescription>
-      </Alert>
-    ),
-    code: (v) => `<Alert variant="${bv(v, "variant")}">\n  <AlertCircle className="size-4" />\n  <AlertTitle>${bt(v, "title")}</AlertTitle>\n  <AlertDescription>${bt(v, "description")}</AlertDescription>\n</Alert>`,
+    render: (v) => {
+      const showActions = bb(v, "showActions");
+      const secondaryLabel = bt(v, "secondaryLabel");
+      return (
+        <Alert variant={bv(v, "variant") as any} className="w-80">
+          <AlertCircle className="size-4" />
+          <AlertTitle>{bt(v, "title")}</AlertTitle>
+          <AlertDescription>{bt(v, "description")}</AlertDescription>
+          {showActions && (
+            <AlertActions>
+              <Button size="sm" variant={bv(v, "variant") === "destructive" ? "destructive" : "default"}>
+                {bt(v, "primaryLabel")}
+              </Button>
+              {secondaryLabel && (
+                <Button size="sm" variant="outline">
+                  {secondaryLabel}
+                </Button>
+              )}
+            </AlertActions>
+          )}
+        </Alert>
+      );
+    },
+    code: (v) => {
+      const showActions = bb(v, "showActions");
+      const secondaryLabel = bt(v, "secondaryLabel");
+      const actionsCode = showActions
+        ? `\n  <AlertActions>\n    <Button size="sm">${bt(v, "primaryLabel")}</Button>${secondaryLabel ? `\n    <Button size="sm" variant="outline">${secondaryLabel}</Button>` : ""}\n  </AlertActions>`
+        : "";
+      return `<Alert variant="${bv(v, "variant")}">\n  <AlertCircle className="size-4" />\n  <AlertTitle>${bt(v, "title")}</AlertTitle>\n  <AlertDescription>${bt(v, "description")}</AlertDescription>${actionsCode}\n</Alert>`;
+    },
   },
   {
     slug: "sonner",

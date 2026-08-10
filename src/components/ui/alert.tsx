@@ -63,4 +63,14 @@ function AlertDescription({
   )
 }
 
-export { Alert, AlertTitle, AlertDescription }
+function AlertActions({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-actions"
+      className={cn("col-start-2 mt-2 flex items-center gap-2", className)}
+      {...props}
+    />
+  )
+}
+
+export { Alert, AlertTitle, AlertDescription, AlertActions }
