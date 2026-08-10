@@ -112,6 +112,8 @@ import {
 import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
 import { SidePanel } from "@/components/ui/side-panel";
 import { InternalLink, ExternalLink, DownloadLink, InlineLink } from "@/components/ui/link";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import type { DateRange } from "react-day-picker";
 import { SegmentedControl, type SegmentedControlOption } from "@/components/ui/segmented-control";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
@@ -716,6 +718,28 @@ const TOGGLE_GROUP_ITEM_POOL = [
   { value: "justify", label: "Justifier", icon: AlignJustify, iconName: "AlignJustify" },
 ];
 
+function DateRangePickerDemo({
+  placeholder,
+  numberOfMonths,
+  disabled,
+}: {
+  placeholder: string;
+  numberOfMonths: number;
+  disabled: boolean;
+}) {
+  const [range, setRange] = useState<DateRange | undefined>(undefined);
+  return (
+    <DateRangePicker
+      value={range}
+      onValueChange={setRange}
+      placeholder={placeholder}
+      numberOfMonths={numberOfMonths}
+      disabled={disabled}
+      className="w-72"
+    />
+  );
+}
+
 export const demos: ComponentDemo[] = [
   // ---------- Inputs & Forms ----------
   {
@@ -975,6 +999,25 @@ export const demos: ComponentDemo[] = [
     ),
     code: (v) => `const [value, setValue] = useState<string[]>(["kanban", "sprints"]);\n\n<MultiSelect\n  options={options}\n  value={value}\n  onValueChange={setValue}\n  placeholder="${bt(v, "placeholder")}"\n  maxCount={${v.maxCount}}${bb(v, "disabled") ? "\n  disabled" : ""}\n/>`,
     states: MULTISELECT_STATES,
+  },
+  {
+    slug: "date-range-picker",
+    name: "Range Date Picker",
+    category: "Inputs & Forms",
+    description: "Champ de saisie pour choisir une période (date de début et date de fin). Composant maison (non fourni par shadcn/ui), construit sur Popover + Calendar mode=\"range\".",
+    controls: [
+      { key: "placeholder", label: "placeholder", type: "text", default: "Sélectionner une période" },
+      { key: "numberOfMonths", label: "nombre de mois affichés", type: "number", default: 2, min: 1, max: 2 },
+      { key: "disabled", label: "disabled", type: "boolean", default: false },
+    ],
+    render: (v) => (
+      <DateRangePickerDemo
+        placeholder={bt(v, "placeholder")}
+        numberOfMonths={Number(v.numberOfMonths)}
+        disabled={bb(v, "disabled")}
+      />
+    ),
+    code: (v) => `const [range, setRange] = useState<DateRange | undefined>();\n\n<DateRangePicker\n  value={range}\n  onValueChange={setRange}\n  placeholder="${bt(v, "placeholder")}"\n  numberOfMonths={${v.numberOfMonths}}${bb(v, "disabled") ? "\n  disabled" : ""}\n/>`,
   },
   {
     slug: "slider",
