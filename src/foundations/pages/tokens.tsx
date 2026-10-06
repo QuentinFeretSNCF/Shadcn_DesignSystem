@@ -29,7 +29,7 @@ function SwatchGrid({ swatches }: { swatches: Swatch[] }) {
   );
 }
 
-function TokenCard({ token }: { token: ColorToken }) {
+function TokenCard({ token, label }: { token: ColorToken; label: string }) {
   return (
     <div
       className="flex flex-col gap-1.5"
@@ -37,7 +37,7 @@ function TokenCard({ token }: { token: ColorToken }) {
     >
       <div className="border-border h-12 rounded-md border" style={{ background: tokenToRgba(token) }} />
       <div className="flex flex-col">
-        <code className="text-foreground font-mono text-[11px]">{token.subpath}</code>
+        <code className="text-foreground font-mono text-[11px]">{label}</code>
         <span className="text-muted-foreground font-mono text-[10px]">
           {token.a < 1 ? tokenToRgba(token) : tokenToHex(token)}
         </span>
@@ -47,16 +47,42 @@ function TokenCard({ token }: { token: ColorToken }) {
   );
 }
 
+const UNGROUPED = "Général";
+
+function subgroupsOf(tokens: ColorToken[]): [string, ColorToken[]][] {
+  const map = new Map<string, ColorToken[]>();
+  for (const t of tokens) {
+    const key = t.subpath.includes("/") ? t.subpath.split("/")[0] : UNGROUPED;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(t);
+  }
+  return Array.from(map.entries());
+}
+
 function TokenGroup({ group }: { group: string }) {
   const tokens = COLOR_TOKENS.filter((t) => t.group === group);
+  const subgroups = subgroupsOf(tokens);
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-5">
       <span className="text-sm font-medium">
         {group} <span className="text-muted-foreground font-normal">({tokens.length})</span>
       </span>
-      <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
-        {tokens.map((t) => (
-          <TokenCard key={t.name} token={t} />
+      <div className="flex flex-col gap-4 pl-1">
+        {subgroups.map(([subgroup, subTokens]) => (
+          <div key={subgroup} className="flex flex-col gap-2">
+            <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+              {subgroup}
+            </span>
+            <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+              {subTokens.map((t) => (
+                <TokenCard
+                  key={t.name}
+                  token={t}
+                  label={subgroup === UNGROUPED ? t.subpath : t.subpath.slice(subgroup.length + 1)}
+                />
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>
