@@ -1,6 +1,7 @@
 import type { FoundationPage } from "./types";
 import { TypographyPage } from "./pages/typography";
-import { ColorsPage } from "./pages/colors";
+import { PrimitivesPage } from "./pages/primitives";
+import { TokensPage } from "./pages/tokens";
 import { SpacingPage } from "./pages/spacing";
 import { MockupsPage } from "./pages/mockups";
 import { ImageRatiosPage } from "./pages/image-ratios";
@@ -13,10 +14,16 @@ export const foundations: FoundationPage[] = [
     render: TypographyPage,
   },
   {
-    slug: "fondamentaux-couleurs",
-    name: "Couleurs",
-    description: "Nuancier des tokens CSS du thème, clair et sombre.",
-    render: ColorsPage,
+    slug: "fondamentaux-primitives",
+    name: "Primitives",
+    description: "Nuancier de marque brut (Figma NewSNCF).",
+    render: PrimitivesPage,
+  },
+  {
+    slug: "fondamentaux-tokens",
+    name: "Tokens",
+    description: "Couche sémantique : tokens Figma (Cobalt) et tokens du code.",
+    render: TokensPage,
   },
   {
     slug: "fondamentaux-espacements",
