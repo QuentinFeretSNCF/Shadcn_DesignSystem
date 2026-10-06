@@ -117,8 +117,8 @@ function ColorsPage() {
       />
 
       <Section
-        title="Primitives (marque LIVE IHM)"
-        description="Nuancier de marque extrait de la librairie Figma « Fondamentaux v0.1 » (collection de variables Primitives/Colors — Legacy, namespace LIVE IHM/*). Ce sont des valeurs brutes, pas encore câblées dans globals.css — seuls 5 tokens Breadcrumb en sont issus pour l'instant (voir plus bas)."
+        title="Primitives (NewSNCF)"
+        description="Nuancier de marque extrait de la librairie Figma « Fondamentaux v0.1 » (collection de variables Primitives/Colors — NewSNCF). 8 familles de 18 paliers chacune (1000 = blanc → 000 = noir). Ce sont des valeurs brutes, pas encore câblées dans globals.css."
       >
         <div className="flex flex-col gap-6">
           {PRIMITIVE_COLOR_FAMILIES.map((family) => (
@@ -172,12 +172,11 @@ function ColorsPage() {
           <code className="text-foreground font-mono text-xs">globals.css</code> et consommés
           uniquement par <code className="text-foreground font-mono text-xs">breadcrumb.tsx</code>.
           Les couleurs partagées ci-dessus (Base, Marque, États...) restent la palette shadcn/ui
-          générique tant que les autres composants n'ont pas migré. Ils correspondent exactement à{" "}
-          <code className="text-foreground font-mono text-xs">LIVE IHM/Prune/1</code>,{" "}
-          <code className="text-foreground font-mono text-xs">LIVE IHM/Prune/2</code> et{" "}
-          <code className="text-foreground font-mono text-xs">LIVE IHM/Gris/8</code> /{" "}
-          <code className="text-foreground font-mono text-xs">black-carbone</code> dans les
-          Primitives ci-dessus.
+          générique tant que les autres composants n'ont pas migré. Ils proviennent de l'ancienne
+          collection Figma <code className="text-foreground font-mono text-xs">
+            Primitives/Colors — Legacy
+          </code> (namespace <code className="text-foreground font-mono text-xs">LIVE IHM/*</code>), pas
+          de la collection NewSNCF affichée dans les Primitives ci-dessus.
         </Callout>
       </Section>
     </div>
